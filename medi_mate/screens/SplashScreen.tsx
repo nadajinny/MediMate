@@ -1,8 +1,15 @@
-// screens/SplashScreen.tsx
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
-const SplashScreen = () => {
+const SplashScreen = ({ navigation }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.replace('Login');  // Login 화면으로 이동
+    }, 2000); // 2초 대기
+
+    return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 해제
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>App name</Text>
@@ -14,14 +21,14 @@ const SplashScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 100,
+    backgroundColor: '#fff',
   },
   appName: {
     fontSize: 24,
-    color: '#001F54', // 네이비 느낌
+    color: '#001F54',
     marginTop: '50%',
   },
   footer: {
