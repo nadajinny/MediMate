@@ -19,7 +19,7 @@ const LoginScreen = ({navigation}) => {
           placeholderTextColor="#999"
         />
 
-        <TouchableOpacity style={styles.loginButton} onPress={()=>navigation.navigate('QuizScreen')}>
+        <TouchableOpacity style={styles.loginButton} onPress={()=>navigation.navigate('Home')}>
           <Text style={styles.loginButtonText}>이메일로 로그인</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginButton}
