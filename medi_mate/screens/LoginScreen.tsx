@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>App name</Text>
@@ -19,8 +19,12 @@ const LoginScreen = () => {
           placeholderTextColor="#999"
         />
 
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity style={styles.loginButton} onPress={()=>navigation.navigate('QuizScreen')}>
           <Text style={styles.loginButtonText}>이메일로 로그인</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.loginButton}
+         onPress={() => navigation.navigate('Register')} >
+          <Text style={styles.loginButtonText}>회원가입</Text>
         </TouchableOpacity>
       </View>
 
@@ -40,7 +44,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     color: '#001F54',
-    marginTop: 60,
+    marginTop: 50,
   },
   form: {
     width: '80%',
@@ -57,6 +61,7 @@ const styles = StyleSheet.create({
   loginButton: {
     borderWidth: 1,
     borderColor: '#FF7A7A',
+    marginBottom: 7, 
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 6,
