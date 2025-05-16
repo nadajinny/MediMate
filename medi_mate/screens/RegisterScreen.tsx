@@ -8,23 +8,35 @@ import {
   Alert,
 } from 'react-native';
 
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [agreed, setAgreed] = useState(false);
-
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    passwordConfirm: '',
+  });
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     let valid = true;
-    let newErrors = {};
+    let newErrors = {
+      name: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
+    };
 
     if (!name.trim()) {
       newErrors.name = '이름을 입력해주세요.';
@@ -68,9 +80,26 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    // 성공 시
-    Alert.alert('회원가입 완료', '내 정보를 입력해주세요.');
-    navigation.navigate('InfoInput');
+    try {
+      const userCredential = await auth().createUserWithEmailAndPassword(email.trim(), password);
+      const user = userCredential.user;
+
+      await firestore().collection('users').doc(user.uid).set({
+        uid: user.uid,
+        email: user.email,
+        name: name.trim(),
+        createdAt: new Date(),
+      });
+
+      Alert.alert('회원가입 완료', '내 정보를 입력해주세요.');
+      navigation.navigate('InfoInput');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        setErrors({ ...newErrors, email: '이미 회원가입되어있는 이메일입니다.' });
+      } else {
+        Alert.alert('회원가입 실패', error.message);
+      }
+    }
   };
 
   return (
@@ -83,7 +112,7 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={setName}
         value={name}
       />
-      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+      {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
 
       <TextInput
         placeholder="이메일 주소"
@@ -91,8 +120,9 @@ const RegisterScreen = ({ navigation }) => {
         keyboardType="email-address"
         onChangeText={setEmail}
         value={email}
+        autoCapitalize="none"
       />
-      {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+      {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
       <TextInput
         placeholder="비밀번호"
@@ -101,7 +131,7 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={setPassword}
         value={password}
       />
-      {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+      {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
       <TextInput
         placeholder="비밀번호 확인"
@@ -110,7 +140,7 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={setPasswordConfirm}
         value={passwordConfirm}
       />
-      {errors.passwordConfirm && <Text style={styles.errorText}>{errors.passwordConfirm}</Text>}
+      {errors.passwordConfirm ? <Text style={styles.errorText}>{errors.passwordConfirm}</Text> : null}
 
       <View style={styles.checkboxContainer}>
         <TouchableOpacity onPress={() => setAgreed(!agreed)} style={styles.checkboxBox}>

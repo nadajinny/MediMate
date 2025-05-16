@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import auth from '@react-native-firebase/auth'; // ✅ Native Firebase Auth 모듈 사용
 
-const LoginScreen = ({navigation}) => {
-  const [email, setEmail] = useState(''); 
-  const [password, setPassword] = useState(''); 
+const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const onLoginPress = () => {
+  const onLoginPress = async () => {
     if (!email.trim()) {
       Alert.alert('입력 오류', '이메일을 입력해주세요.');
       return;
@@ -15,10 +16,21 @@ const LoginScreen = ({navigation}) => {
       return;
     }
 
-    // 모든 입력값이 유효한 경우 홈 화면으로 이동
-    navigation.navigate('Home');
+    try {
+      await auth().signInWithEmailAndPassword(email.trim(), password); // ✅ Native SDK 방식
+      navigation.navigate('Home');
+    } catch (error) {
+      if (error.code === 'auth/user-not-found') {
+        Alert.alert('로그인 실패', '존재하지 않는 계정입니다.');
+      } else if (error.code === 'auth/wrong-password') {
+        Alert.alert('로그인 실패', '비밀번호가 일치하지 않습니다.');
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('로그인 실패', '이메일 형식이 올바르지 않습니다.');
+      } else {
+        Alert.alert('로그인 실패', '로그인 중 오류가 발생했습니다.');
+      }
+    }
   };
-
 
   return (
     <View style={styles.container}>
@@ -29,23 +41,26 @@ const LoginScreen = ({navigation}) => {
           placeholder="이메일을 주소를 입력하세요."
           style={styles.input}
           placeholderTextColor="#999"
-          value = {email}
+          value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
         <TextInput
           placeholder="비밀번호를 입력하세요."
           secureTextEntry
           style={styles.input}
           placeholderTextColor="#999"
-          value = {password}
+          value={password}
           onChangeText={setPassword}
         />
 
         <TouchableOpacity style={styles.loginButton} onPress={onLoginPress}>
           <Text style={styles.loginButtonText}>이메일로 로그인</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.loginButton}
-         onPress={() => navigation.navigate('Register')} >
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => navigation.navigate('Register')}>
           <Text style={styles.loginButtonText}>회원가입</Text>
         </TouchableOpacity>
       </View>
