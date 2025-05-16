@@ -6,42 +6,148 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  CheckBox, // 만약 이게 안 되면 @react-native-community/checkbox 패키지를 설치하세요
 } from 'react-native';
 
-const RegisterScreen = ({ navigation }) => {
-  const [agreed, setAgreed] = useState(false);
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
-  const handleRegister = () => {
+const RegisterScreen = ({ navigation }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [agreed, setAgreed] = useState(false);
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    passwordConfirm: '',
+  });
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleRegister = async () => {
+    let valid = true;
+    let newErrors = {
+      name: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
+    };
+
+    if (!name.trim()) {
+      newErrors.name = '이름을 입력해주세요.';
+      valid = false;
+    } else if (name.trim().length < 4) {
+      newErrors.name = '아이디는 최소 4자 이상이어야 합니다.';
+      valid = false;
+    }
+
+    if (!email.trim()) {
+      newErrors.email = '이메일을 입력해주세요.';
+      valid = false;
+    } else if (!validateEmail(email.trim())) {
+      newErrors.email = '이메일 형식이 올바르지 않습니다.';
+      valid = false;
+    }
+
+    if (!password.trim()) {
+      newErrors.password = '비밀번호를 입력해주세요.';
+      valid = false;
+    } else if (password.length < 8) {
+      newErrors.password = '비밀번호는 최소 8자 이상이어야 합니다.';
+      valid = false;
+    }
+
+    if (!passwordConfirm.trim()) {
+      newErrors.passwordConfirm = '비밀번호 확인을 입력해주세요.';
+      valid = false;
+    } else if (password !== passwordConfirm) {
+      newErrors.passwordConfirm = '비밀번호가 일치하지 않습니다.';
+      valid = false;
+    }
+
     if (!agreed) {
       Alert.alert('알림', '약관 및 개인정보 보호정책에 동의해야 가입할 수 있습니다.');
       return;
     }
 
-    // TODO: 회원가입 로직 처리 후 InfoInput 페이지로 이동
-    Alert.alert('회원가입 완료', '내 정보를 입력해주세요.');
-    
-    navigation.navigate('InfoInput');
+    if (!valid) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      const userCredential = await auth().createUserWithEmailAndPassword(email.trim(), password);
+      const user = userCredential.user;
+
+      await firestore().collection('users').doc(user.uid).set({
+        uid: user.uid,
+        email: user.email,
+        name: name.trim(),
+        createdAt: new Date(),
+      });
+
+      Alert.alert('회원가입 완료', '내 정보를 입력해주세요.');
+      navigation.navigate('InfoInput');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        setErrors({ ...newErrors, email: '이미 회원가입되어있는 이메일입니다.' });
+      } else {
+        Alert.alert('회원가입 실패', error.message);
+      }
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>회원가입</Text>
 
-      <TextInput placeholder="이름" style={styles.input} />
-      <TextInput placeholder="휴대폰 번호" style={styles.input} keyboardType="phone-pad" />
-      <TextInput placeholder="비밀번호" secureTextEntry style={styles.input} />
-      <TextInput placeholder="성별 (남자 / 여자)" style={styles.input} />
-      <TextInput placeholder="연령(만)" style={styles.input} keyboardType="numeric" />
-      <TextInput placeholder="주소" style={styles.input} />
+      <TextInput
+        placeholder="이름 (아이디)"
+        style={styles.input}
+        onChangeText={setName}
+        value={name}
+      />
+      {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
+
+      <TextInput
+        placeholder="이메일 주소"
+        style={styles.input}
+        keyboardType="email-address"
+        onChangeText={setEmail}
+        value={email}
+        autoCapitalize="none"
+      />
+      {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+
+      <TextInput
+        placeholder="비밀번호"
+        secureTextEntry
+        style={styles.input}
+        onChangeText={setPassword}
+        value={password}
+      />
+      {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+
+      <TextInput
+        placeholder="비밀번호 확인"
+        secureTextEntry
+        style={styles.input}
+        onChangeText={setPasswordConfirm}
+        value={passwordConfirm}
+      />
+      {errors.passwordConfirm ? <Text style={styles.errorText}>{errors.passwordConfirm}</Text> : null}
 
       <View style={styles.checkboxContainer}>
         <TouchableOpacity onPress={() => setAgreed(!agreed)} style={styles.checkboxBox}>
           <View style={agreed ? styles.checkboxChecked : styles.checkboxEmpty} />
         </TouchableOpacity>
         <Text style={styles.checkboxLabel}>
-          가입을 위해{' '}
-          <Text style={{ fontWeight: 'bold' }}>약관</Text>과{' '}
+          가입을 위해 <Text style={{ fontWeight: 'bold' }}>약관</Text>과{' '}
           <Text style={{ fontWeight: 'bold' }}>개인정보 보호정책</Text>에 동의합니다.
         </Text>
       </View>
@@ -70,8 +176,14 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    marginBottom: 15,
+    marginBottom: 8,
     borderRadius: 4,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 13,
+    marginBottom: 8,
+    marginLeft: 4,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -111,6 +223,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
 
 export default RegisterScreen;
