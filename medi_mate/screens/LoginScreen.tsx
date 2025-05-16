@@ -1,7 +1,25 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert } from 'react-native';
 
 const LoginScreen = ({navigation}) => {
+  const [email, setEmail] = useState(''); 
+  const [password, setPassword] = useState(''); 
+
+  const onLoginPress = () => {
+    if (!email.trim()) {
+      Alert.alert('입력 오류', '이메일을 입력해주세요.');
+      return;
+    }
+    if (!password.trim()) {
+      Alert.alert('입력 오류', '비밀번호를 입력해주세요.');
+      return;
+    }
+
+    // 모든 입력값이 유효한 경우 홈 화면으로 이동
+    navigation.navigate('Home');
+  };
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>App name</Text>
@@ -11,15 +29,19 @@ const LoginScreen = ({navigation}) => {
           placeholder="이메일을 주소를 입력하세요."
           style={styles.input}
           placeholderTextColor="#999"
+          value = {email}
+          onChangeText={setEmail}
         />
         <TextInput
           placeholder="비밀번호를 입력하세요."
           secureTextEntry
           style={styles.input}
           placeholderTextColor="#999"
+          value = {password}
+          onChangeText={setPassword}
         />
 
-        <TouchableOpacity style={styles.loginButton} onPress={()=>navigation.navigate('Home')}>
+        <TouchableOpacity style={styles.loginButton} onPress={onLoginPress}>
           <Text style={styles.loginButtonText}>이메일로 로그인</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginButton}
