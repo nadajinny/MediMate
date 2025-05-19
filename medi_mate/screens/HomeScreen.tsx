@@ -23,7 +23,7 @@ const HomeScreen = ({ navigation }) => {
 
       {/* 가운데 버튼 */}
       <View style={styles.centerContent}>
-        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('NextScreen')}>
+        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('Fullbody')}>
           <Text style={styles.startText}>시작하기</Text>
           <Icon name="chevron-forward" size={24} color="#000" />
         </TouchableOpacity>
