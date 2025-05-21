@@ -14,7 +14,7 @@ const HomeScreen = ({ navigation }) => {
       {/* 상단 바 */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>홈화면</Text>
-        <TouchableOpacity style={styles.menuIcon}>
+        <TouchableOpacity style={styles.menuIcon} onPress={()=>navigation.navigate('Setting')}>
           <View style={styles.menuLine} />
           <View style={styles.menuLine} />
           <View style={styles.menuLine} />

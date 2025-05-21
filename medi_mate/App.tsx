@@ -14,7 +14,7 @@ import HomeScreen from './screens/HomeScreen';
 import FullbodyScreen from './screens/FullbodyScreen';
 import DetailScreen from './screens/DetailScreen';
 import PainLevelScreen from './screens/PainLevelScreen';
-
+import SettingScreen from './screens/SettingScreen';
 // 실시간 감지 컴포넌트
 import AccessWatcher from './components/AccessWatcher';
 
@@ -68,6 +68,7 @@ export default function App() {
           <Stack.Screen name="Fullbody" component={FullbodyScreen} />
           <Stack.Screen name="Detail" component={DetailScreen} />
           <Stack.Screen name="PainLevel" component={PainLevelScreen} />
+          <Stack.Screen name="Setting" component={SettingScreen}/>
         </Stack.Navigator>
       </NavigationContainer>
     </>
