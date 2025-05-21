@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   roleButton: {
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: '#87CEFA',
     borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   roleSelected: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#87CEFA',
   },
   roleText: {
     textAlign: 'center',
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     width: 20,
     height: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#87CEFA',
     borderRadius: 4,
   },
   checkboxLabel: {

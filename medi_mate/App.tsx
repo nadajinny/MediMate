@@ -64,7 +64,7 @@ export default function App() {
           <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
           <Stack.Screen name="Fullbody" component={FullbodyScreen} />
           <Stack.Screen name="Detail" component={DetailScreen} />
           <Stack.Screen name="PainLevel" component={PainLevelScreen} />

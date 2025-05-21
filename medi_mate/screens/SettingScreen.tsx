@@ -61,7 +61,7 @@ const SettingsScreen = ({ navigation }) => {
       <Text style={styles.label}>내 Custom ID:</Text>
       <Text style={styles.customID}>{customID || '불러오는 중...'}</Text>
 
-      <Button title="로그아웃" onPress={handleLogout} color="#d9534f" />
+      <Button title="로그아웃" onPress={handleLogout} color="#001F54" />
     </View>
   );
 };

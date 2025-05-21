@@ -56,7 +56,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.appName}>App name</Text>
+      <Text style={styles.appName}>Medi-Mate</Text>
 
       <View style={styles.form}>
         <TextInput
@@ -87,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.footer}>KIMPACT Lab.</Text>
+      <Text style={styles.footer}>CMD Corp.</Text>
     </View>
   );
 };
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   appName: {
+    fontFamily: '', 
     fontSize: 24,
     color: '#001F54',
     marginTop: 50,
@@ -115,14 +116,14 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#001F54',
     paddingVertical: 12,
     marginBottom: 20,
     fontSize: 16,
   },
   loginButton: {
     borderWidth: 1,
-    borderColor: '#FF7A7A',
+    borderColor: '#001F54',
     marginBottom: 7, 
     paddingVertical: 12,
     paddingHorizontal: 20,
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#FF7A7A',
+    color: '#001F54',
     fontWeight: '600',
     fontSize: 16,
   },
