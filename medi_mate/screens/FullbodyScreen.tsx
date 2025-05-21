@@ -24,7 +24,7 @@ const FullbodyScreen = ({ navigation }) => {
       <>
         <TouchableOpacity
           style={[styles.button, { top: '20%', left: '42%', width: '18%', height: '8%' }]}
-          onPress={() => handlePress('상체')}
+          onPress={() => handlePress('머리')}
         />
         <TouchableOpacity
           style={[styles.button, { top: '30%', left: '41%', width: '18%', height: '20%' }]}

@@ -10,6 +10,8 @@ import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import FullbodyScreen from './screens/FullbodyScreen';
 import DetailScreen from './screens/DetailScreen';
+import PainLevelScreen from './screens/PainLevelScreen';
+
 import 'react-native-gesture-handler';
 
 // import MainTabs from './screens/MainTabs';
@@ -28,6 +30,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen}/>
         <Stack.Screen name="Fullbody" component={FullbodyScreen}/>
         <Stack.Screen name="Detail" component={DetailScreen}/> 
+        <Stack.Screen name="PainLevel" component={PainLevelScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
