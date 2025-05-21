@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import auth from '@react-native-firebase/auth'; // ✅ Native Firebase Auth 모듈 사용
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const saveLoginInfo = async (user) => {
+    try {
+      await AsyncStorage.setItem('@login_data', JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+      }));
+    } catch (e) {
+      console.error('로그인 정보 저장 실패:', e);
+    }
+  };
 
   const onLoginPress = async () => {
     if (!email.trim()) {
@@ -17,8 +36,11 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      await auth().signInWithEmailAndPassword(email.trim(), password); // ✅ Native SDK 방식
-      navigation.navigate('Home');
+      const userCredential = await auth().signInWithEmailAndPassword(email.trim(), password);
+      const user = userCredential.user;
+
+      await saveLoginInfo(user); // ✅ 로그인 성공 시 저장
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); // 뒤로가기 방지
     } catch (error) {
       if (error.code === 'auth/user-not-found') {
         Alert.alert('로그인 실패', '존재하지 않는 계정입니다.');
@@ -34,7 +56,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.appName}>App name</Text>
+      <Text style={styles.appName}>Medi-Mate</Text>
 
       <View style={styles.form}>
         <TextInput
@@ -65,10 +87,13 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.footer}>KIMPACT Lab.</Text>
+      <Text style={styles.footer}>CMD Corp.</Text>
     </View>
   );
 };
+
+export default LoginScreen;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -79,6 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   appName: {
+    fontFamily: '', 
     fontSize: 24,
     color: '#001F54',
     marginTop: 50,
@@ -90,14 +116,14 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#001F54',
     paddingVertical: 12,
     marginBottom: 20,
     fontSize: 16,
   },
   loginButton: {
     borderWidth: 1,
-    borderColor: '#FF7A7A',
+    borderColor: '#001F54',
     marginBottom: 7, 
     paddingVertical: 12,
     paddingHorizontal: 20,
@@ -106,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#FF7A7A',
+    color: '#001F54',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -116,4 +142,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;

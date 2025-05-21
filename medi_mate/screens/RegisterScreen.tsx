@@ -1,33 +1,37 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,
 } from 'react-native';
-
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 const RegisterScreen = ({ navigation }) => {
+  // 👇 상태들
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [role, setRole] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState({
     name: '',
     email: '',
     password: '',
     passwordConfirm: '',
+    role: '',
   });
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  // ✅ 5자리 영문/숫자 랜덤 ID 생성
+  const generateRandomId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   };
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleRegister = async () => {
     let valid = true;
@@ -36,8 +40,10 @@ const RegisterScreen = ({ navigation }) => {
       email: '',
       password: '',
       passwordConfirm: '',
+      role: '',
     };
 
+    // 👇 유효성 검사
     if (!name.trim()) {
       newErrors.name = '이름을 입력해주세요.';
       valid = false;
@@ -70,6 +76,11 @@ const RegisterScreen = ({ navigation }) => {
       valid = false;
     }
 
+    if (!role) {
+      newErrors.role = '역할을 선택해주세요.';
+      valid = false;
+    }
+
     if (!agreed) {
       Alert.alert('알림', '약관 및 개인정보 보호정책에 동의해야 가입할 수 있습니다.');
       return;
@@ -81,17 +92,24 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
+      // ✅ 회원가입 시도
       const userCredential = await auth().createUserWithEmailAndPassword(email.trim(), password);
       const user = userCredential.user;
 
+      // ✅ 랜덤 ID 생성
+      const customId = generateRandomId();
+
+      // ✅ Firestore에 사용자 정보 저장
       await firestore().collection('users').doc(user.uid).set({
         uid: user.uid,
         email: user.email,
         name: name.trim(),
+        role: role,
+        customId: customId, // <-- 여기에 랜덤 ID 저장
         createdAt: new Date(),
       });
 
-      Alert.alert('회원가입 완료', '내 정보를 입력해주세요.');
+      Alert.alert('회원가입 완료', `ID가 생성되었습니다: ${customId}`);
       navigation.navigate('InfoInput');
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
@@ -142,6 +160,27 @@ const RegisterScreen = ({ navigation }) => {
       />
       {errors.passwordConfirm ? <Text style={styles.errorText}>{errors.passwordConfirm}</Text> : null}
 
+      {/* 역할 선택 */}
+      <View style={styles.roleContainer}>
+        <Text style={styles.roleLabel}>역할 선택:</Text>
+        <View style={styles.roleOptions}>
+          <TouchableOpacity
+            style={[styles.roleButton, role === 'doctor' && styles.roleSelected]}
+            onPress={() => setRole('doctor')}
+          >
+            <Text style={styles.roleText}>의사</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.roleButton, role === 'user' && styles.roleSelected]}
+            onPress={() => setRole('user')}
+          >
+            <Text style={styles.roleText}>사용자</Text>
+          </TouchableOpacity>
+        </View>
+        {errors.role ? <Text style={styles.errorText}>{errors.role}</Text> : null}
+      </View>
+
+      {/* 약관 동의 */}
       <View style={styles.checkboxContainer}>
         <TouchableOpacity onPress={() => setAgreed(!agreed)} style={styles.checkboxBox}>
           <View style={agreed ? styles.checkboxChecked : styles.checkboxEmpty} />
@@ -185,6 +224,34 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 4,
   },
+  roleContainer: {
+    marginBottom: 16,
+  },
+  roleLabel: {
+    fontSize: 14,
+    marginBottom: 6,
+    fontWeight: 'bold',
+  },
+  roleOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  roleButton: {
+    borderWidth: 1,
+    borderColor: '#87CEFA',
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flex: 1,
+    marginRight: 10,
+  },
+  roleSelected: {
+    backgroundColor: '#87CEFA',
+  },
+  roleText: {
+    textAlign: 'center',
+    color: '#000',
+  },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -204,7 +271,7 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     width: 20,
     height: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#87CEFA',
     borderRadius: 4,
   },
   checkboxLabel: {

@@ -14,7 +14,7 @@ const HomeScreen = ({ navigation }) => {
       {/* 상단 바 */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>홈화면</Text>
-        <TouchableOpacity style={styles.menuIcon}>
+        <TouchableOpacity style={styles.menuIcon} onPress={()=>navigation.navigate('Setting')}>
           <View style={styles.menuLine} />
           <View style={styles.menuLine} />
           <View style={styles.menuLine} />
@@ -23,9 +23,8 @@ const HomeScreen = ({ navigation }) => {
 
       {/* 가운데 버튼 */}
       <View style={styles.centerContent}>
-        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('NextScreen')}>
-          <Text style={styles.startText}>시작하기</Text>
-          <Icon name="chevron-forward" size={24} color="#000" />
+        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate('Fullbody')}>
+          <Text style={styles.startText}>진료 시작하기</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -41,8 +40,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    backgroundColor: '#000',
-    height: 50,
+    backgroundColor: '#001F54',
+    height: 80,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -73,13 +72,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 28,
     borderWidth: 4,
-    borderColor: '#000',
+    borderColor: '#001F54',
     borderRadius: 50,
   },
   startText: {
     fontSize: 20,
     fontWeight: 'bold',
     marginRight: 8,
-    color: '#000',
+    color: '#001F54',
   },
 });
