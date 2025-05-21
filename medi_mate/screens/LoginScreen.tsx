@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import auth from '@react-native-firebase/auth'; // ✅ Native Firebase Auth 모듈 사용
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const saveLoginInfo = async (user) => {
+    try {
+      await AsyncStorage.setItem('@login_data', JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+      }));
+    } catch (e) {
+      console.error('로그인 정보 저장 실패:', e);
+    }
+  };
 
   const onLoginPress = async () => {
     if (!email.trim()) {
@@ -17,8 +36,11 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      await auth().signInWithEmailAndPassword(email.trim(), password); // ✅ Native SDK 방식
-      navigation.navigate('Home');
+      const userCredential = await auth().signInWithEmailAndPassword(email.trim(), password);
+      const user = userCredential.user;
+
+      await saveLoginInfo(user); // ✅ 로그인 성공 시 저장
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); // 뒤로가기 방지
     } catch (error) {
       if (error.code === 'auth/user-not-found') {
         Alert.alert('로그인 실패', '존재하지 않는 계정입니다.');
@@ -70,6 +92,9 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
+export default LoginScreen;
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -116,4 +141,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
