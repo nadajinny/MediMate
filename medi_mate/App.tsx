@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth'; // Firebase 사용자 인증
 import 'react-native-gesture-handler';
-
+import MyAccessLogs from './screens/MyAccessLogs';
 // 스크린 import
 import SplashScreen from './screens/SplashScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -58,7 +58,7 @@ export default function App() {
   return (
     <>
       {/* 로그인된 경우에만 AccessWatcher 작동 */}
-      {user && <AccessWatcher />}
+      {user && <AccessWatcher uid={user.uid} />}
       <NavigationContainer>
         <Stack.Navigator initialRouteName={initialRoute}>
           <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
@@ -69,6 +69,7 @@ export default function App() {
           <Stack.Screen name="Detail" component={DetailScreen} />
           <Stack.Screen name="PainLevel" component={PainLevelScreen} />
           <Stack.Screen name="Setting" component={SettingScreen}/>
+          <Stack.Screen name="MyAccess" component={MyAccessLogs}/>
         </Stack.Navigator>
       </NavigationContainer>
     </>
