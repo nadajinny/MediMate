@@ -35,10 +35,6 @@ const MyAccessLogs = () => {
           setLogs(entries);
           setLoading(false);
         },
-        error => {
-          console.error('Firestore 오류:', error);
-          setLoading(false);
-        }
       );
 
     return () => unsubscribe();
